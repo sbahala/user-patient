@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
+    List<Patient> findByNameStartingWithIgnoreCase(String prefix);
     // Method to find a patient by their email
     Optional<Patient> findByEmail(String email);
 

@@ -3,6 +3,8 @@ package com.example.userpatientdemo.service;
 import com.example.userpatientdemo.model.Patient;
 import com.example.userpatientdemo.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,7 +50,8 @@ public class PatientService {
         patientRepository.deleteById(id);
     }
 
-    public List<Patient> getPatientsByNameStartingWith(String prefix) {
-        return patientRepository.findByNameStartingWith(prefix.toLowerCase());
+    @Query("SELECT p FROM Patient p WHERE LOWER(p.name) LIKE LOWER(CONCAT(:prefix, '%'))")
+    public List<Patient> getPatientsByNameStartingWith(@Param("prefix") String prefix) {
+        return patientRepository.findByNameStartingWithIgnoreCase(prefix);
     }
 }

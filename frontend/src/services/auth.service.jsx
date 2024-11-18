@@ -83,4 +83,14 @@ export const authService = {
       throw error.response?.data || error.message;
     }
   },
+
+  testPatients: async() => {
+    try{
+      const response = await axioxInstance.get(`/patients/test-names`);
+      return response.data;
+    }
+    catch{
+      throw error.response?.data || error.message;
+    }
+  }
 };

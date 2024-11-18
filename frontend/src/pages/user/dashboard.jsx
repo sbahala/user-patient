@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Pencil, Trash2, Plus } from 'lucide-react';
+import { Eye, Pencil, Trash2, Plus, RefreshCcw, LogOut } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { authService } from '../../services/auth.service';
 import { useToast } from "@/hooks/use-toast"
@@ -28,6 +28,8 @@ const PatientDashboard = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isTestOpen, setIsTestOpen] = useState(false);
+
   const navigate = useNavigate();
 
 
@@ -37,7 +39,7 @@ const PatientDashboard = () => {
 
 
   const fetchPatients = async () => {
-
+    setIsTestOpen(false)
     try {
       let result = await authService.getPatients();
       if (result && Array.isArray(result)) {
@@ -224,9 +226,26 @@ const PatientDashboard = () => {
   };
 
 
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     localStorage.clear();
     navigate('/login')
+  }
+
+  const handleTest = async () => {
+    setIsTestOpen(true)
+
+    try {
+      let result = await authService.testPatients();
+      if (result) {
+        setPatients(result)
+      }
+    }
+    catch (er) {
+      toast({
+        description: er?.message,
+      })
+      console.log(er)
+    }
   }
 
   const AddPatientDialog = ({ isOpen, onClose, onAdd }) => {
@@ -319,18 +338,46 @@ const PatientDashboard = () => {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Patients Dashboard</h1>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => setIsAddOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Patient
+            </Button>
+
+            {
+              !isTestOpen && (
+                <Button
+                  onClick={handleTest}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Filter Test Patient
+                </Button>
+              )
+            }
+
+
+            {isTestOpen && (
+              <Button
+                onClick={fetchPatients}
+                className="flex items-center gap-2"
+              >
+                <RefreshCcw className="h-4 w-4" />
+                Clear Test
+              </Button>
+            )}
+          </div>
+
           <Button
-            onClick={() => setIsAddOpen(true)}
+            variant="outline"
+            onClick={handleLogout}
             className="flex items-center gap-2"
           >
-            <Plus className="h-4 w-4" />
-            Add Patient
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleLogout}
-          >
+            <LogOut className="h-4 w-4" />
             Logout
           </Button>
         </div>
