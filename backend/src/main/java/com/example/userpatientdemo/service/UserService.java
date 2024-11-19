@@ -5,6 +5,8 @@ import com.example.userpatientdemo.model.User;
 import com.example.userpatientdemo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
@@ -18,7 +20,7 @@ public class UserService {
         // Here, you can add password encoding logic and other validations.
         Optional<User> existingPatient = userRepository.findByEmail(user.getEmail());
         if (existingPatient.isPresent()) {
-            throw new IllegalArgumentException("Email is already in use.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Email is already in use.");
         }
         // Save the new patient if email is unique
         return userRepository.save(user);

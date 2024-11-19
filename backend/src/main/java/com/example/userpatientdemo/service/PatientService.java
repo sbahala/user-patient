@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ public class PatientService {
         // Check if the email already exists in the database
         Optional<Patient> existingPatient = patientRepository.findByEmail(patient.getEmail());
         if (existingPatient.isPresent()) {
-            throw new IllegalArgumentException("Email is already in use.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Email is already in use.");
         }
         // Save the new patient if email is unique
         return patientRepository.save(patient);
@@ -37,7 +39,7 @@ public class PatientService {
     public Patient updatePatient(Long id, Patient patient) {
         // Ensure that the ID in the request matches an existing patient
         if (!patientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Patient not found.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Patient not found.");
         }
         patient.setId(id);
         return patientRepository.save(patient);
@@ -45,7 +47,7 @@ public class PatientService {
 
     public void deletePatient(Long id) {
         if (!patientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Patient not found.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Patient not found.");
         }
         patientRepository.deleteById(id);
     }
